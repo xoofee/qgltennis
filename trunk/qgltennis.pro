@@ -12,12 +12,12 @@ TEMPLATE = app
 TARGET   = qgltennis 
 
 HEADERS  = Viewer.h \
-    ../vmath-0.9/src/vmath.h \
+    ./vmath-0.9/src/vmath.h \
     CourtHelper.h \
     Court.h \
     Ball.h
 SOURCES  = Viewer.cpp main.cpp \
-    ../vmath-0.9/src/vmath.cpp \
+    ./vmath-0.9/src/vmath.cpp \
     CourtHelper.cpp \
     Court.cpp \
     Ball.cpp
@@ -32,9 +32,15 @@ CONFIG += qt opengl warn_on thread rtti embed_manifest_exe no_keywords
 
 # The remaining of this configuration tries to automatically detect the library paths.
 # In your applications, you can probably simply use (see doc/compilation.html for details) :
-
-INCLUDEPATH *= /home/tomas/code/qgltennis/ /home/tomas/code/vmath-0.9/src
+unix {
+INCLUDEPATH *= /home/tomas/code/qgltennis/ /home/tomas/code/qgltennis/vmath-0.9/src
 LIBS *= -L/home/tomas/code/qgltennis/QGLViewer -lQGLViewer
+}
+
+win32 {
+INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src
+LIBS *= -LC:/Users/Tomas/Desktop/qgltennis/QGLViewer/debug -lQGLViewerd2
+}
 
 # Change these paths according to your configuration.
 
