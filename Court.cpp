@@ -51,8 +51,12 @@ void Court::loadImage()
   QImage img(name);
 
   if (img.isNull()) {
-    qWarning("Unable to load file, unsupported file format");
-    return;
+    img.load("./debug/textures/s02_court.jpg");
+    
+    if (img.isNull()) {
+      qWarning("Unable to load file, unsupported file format");
+      return;
+    }
   }
 
   qWarning("Loading %s, %dx%d pixels", name.toLatin1().constData(), img.width(), img.height());

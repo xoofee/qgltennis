@@ -9,8 +9,8 @@ bool antiAlias(false);
 
 void Viewer::init()
 {
-  setSceneRadius(400.0);          // scene has a 100 OpenGL units radius
   setSceneCenter( Vec(158,384,0) );
+  setSceneRadius(500.0);          // scene has a 100 OpenGL units radius
   camera()->showEntireScene();
   //restoreStateFromFile();
 
