@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 
   Viewer viewer;
 
-  viewer.setWindowTitle("qtennis");
+  viewer.setWindowTitle("qgltennis");
   viewer.show();
   
   return application.exec();
