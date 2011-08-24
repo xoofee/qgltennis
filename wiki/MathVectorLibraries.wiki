@@ -2,7 +2,7 @@
 
 There are many alternatives to use math vector & matrix libraries with OpenGL. These ones have been considered:
 
-  * [http://bartipan.net/vmath/ vmath] is simple and worked easily. currently used in the code.
+  * [http://bartipan.net/vmath/ vmath] is simple and worked easily. Currently used in the code.
   * I used [http://www.cs.cmu.edu/~ajw/doc/svl.html SVL] in the past. It gave me some problems compiling ¿LibSVL.do? on Linux. It is old and currently has no maintenace.
   * [http://vmmlib.sourceforge.net/ vmmlib] reported link error on Linux, missed -lclapk and -lf2c. Only needs a .hpp file. SVL autor is involved and it seems quite new.
   * Haven't tested [eigen.tuxfamily.org Eigen]. It has version 2 and 3.
