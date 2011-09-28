@@ -11,10 +11,6 @@ Vector3f upperServiceLineEndPoint1(77.0, 258.0, 50.0), upperServiceLineEndPoint2
 Vector3f lowerServiceLineEndPoint1(77.0, 510, 50.0), lowerServiceLineEndPoint2(239.0, 510, 50.0);
 Vector3f serviceLineTPoint1(158.0, 258.0, 50.0), serviceLineTPoint2(158.0, 510, 50.0);
 
-CourtHelper::CourtHelper()
-{
-}
-
 void CourtHelper::draw()
 {
   glColor3f(1.0, 0.0, 0.0);

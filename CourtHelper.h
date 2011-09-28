@@ -4,7 +4,7 @@
 class CourtHelper
 {
 public:
-  CourtHelper();
+  CourtHelper() { }
 
   void draw();
 private:

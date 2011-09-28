@@ -6,7 +6,7 @@
 class Ball
 {
 public:
-  Ball();
+  Ball() { }
   void init();
   void draw();
   void animate();

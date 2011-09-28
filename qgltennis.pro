@@ -15,18 +15,28 @@ HEADERS  = Viewer.h \
     ./vmath-0.9/src/vmath.h \
     CourtHelper.h \
     Court.h \
-    Ball.h
+    Ball.h \
+    cutelogger/src/Logger.h \
+    cutelogger/src/FileAppender.h \
+    cutelogger/src/ConsoleAppender.h \
+    cutelogger/src/AbstractStringAppender.h \
+    cutelogger/src/AbstractAppender.h
 SOURCES  = Viewer.cpp main.cpp \
     ./vmath-0.9/src/vmath.cpp \
     CourtHelper.cpp \
     Court.cpp \
-    Ball.cpp
+    Ball.cpp \
+    cutelogger/src/Logger.cpp \
+    cutelogger/src/FileAppender.cpp \
+    cutelogger/src/ConsoleAppender.cpp \
+    cutelogger/src/AbstractStringAppender.cpp \
+    cutelogger/src/AbstractAppender.cpp
 
 DISTFILES += *.png
 
 QT *= xml opengl
 
-CONFIG += qt opengl warn_on thread rtti embed_manifest_exe no_keywords
+CONFIG += qt opengl warn_on thread rtti embed_manifest_exe #no_keywords
 
 # --------------------------------------------------------------------------------------
 
@@ -38,7 +48,7 @@ LIBS *= -L/home/tomas/code/qgltennis/QGLViewer -lQGLViewer
 }
 
 win32 {
-INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src
+INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src C:/Users/Tomas/Desktop/qgltennis/cutelogger/src
 LIBS *= -LC:/Users/Tomas/Desktop/qgltennis/QGLViewer/debug -lQGLViewerd2
 }
 

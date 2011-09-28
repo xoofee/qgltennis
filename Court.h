@@ -4,7 +4,7 @@
 class Court
 {
 public:
-  Court();
+  Court() { }
   void init();
   void draw();
   void loadImage();

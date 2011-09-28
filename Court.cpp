@@ -6,9 +6,8 @@
 
 #include <math.h>
 
-Court::Court()
-{
-}
+#include "Logger.h"
+#include <QDebug>
 
 void Court::init()
 {
@@ -47,19 +46,23 @@ void Court::draw()
 void Court::loadImage()
 {
   QString name("./textures/s02_court.jpg");
+  LOG_DEBUG() << "Loading " << name;
 
   QImage img(name);
 
   if (img.isNull()) {
-    img.load("./debug/textures/s02_court.jpg");
+    LOG_DEBUG() << name << "Not found";
+    
+    name = "./debug/textures/s02_court.jpg";
+    img.load(name);
     
     if (img.isNull()) {
-      qWarning("Unable to load file, unsupported file format");
+      LOG_DEBUG() << "Unable to load file " << name << "unsupported file format";
       return;
     }
   }
-
-  qWarning("Loading %s, %dx%d pixels", name.toLatin1().constData(), img.width(), img.height());
+  
+  LOG_WARNING() << "Loading " << name.toLatin1().constData() << ", " << img.width() << "x" << img.height() << " pixels";
 
   // 1E-3 needed. Just try with width=128 and see !
   int newWidth  = 1<<(int)(1+log(img.width() -1+1E-3) / log(2.0));
