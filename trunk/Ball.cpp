@@ -1,11 +1,9 @@
 #include "Ball.h"
 #include <GL/gl.h>
 #include <math.h>
-#include <stdio.h>
 
-Ball::Ball()
-{
-}
+#include "Logger.h"
+#include <QDebug>
 
 void Ball::init()
 {
@@ -58,10 +56,10 @@ void Ball::animate()
     bounce++;
     z_pos = 1.1;
     if (bounce == 1) {
-      printf("1 bounce\n");
+      LOG_DEBUG() << "1 bounce";
     }
     else {
-      printf("other bounce\n");
+      LOG_DEBUG() << "other bounce";
       bounce = 0;
 
       if (theta == PI/8.0) { theta=9.0*PI/8.0; }

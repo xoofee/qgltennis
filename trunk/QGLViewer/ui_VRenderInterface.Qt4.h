@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'VRenderInterface.Qt4.ui'
 **
-** Created: Thu Jul 21 17:19:01 2011
-**      by: Qt User Interface Compiler version 4.7.2
+** Created: Sun 18. Sep 12:47:32 2011
+**      by: Qt User Interface Compiler version 4.7.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
