@@ -43,13 +43,16 @@ CONFIG += qt opengl warn_on thread rtti embed_manifest_exe #no_keywords
 # The remaining of this configuration tries to automatically detect the library paths.
 # In your applications, you can probably simply use (see doc/compilation.html for details) :
 unix {
-INCLUDEPATH *= /home/tomas/code/qgltennis/ /home/tomas/code/qgltennis/vmath-0.9/src
-LIBS *= -L/home/tomas/code/qgltennis/QGLViewer -lQGLViewer
+  INCLUDEPATH *= /home/tomas/qgltennis/ /home/tomas/qgltennis/vmath-0.9/src /home/tomas/qgltennis/cutelogger/src
+  LIBS *= -L/home/tomas/qgltennis/QGLViewer -lQGLViewer
+
+  MOC_DIR = .moc
+  OBJECTS_DIR = .obj
 }
 
 win32 {
-INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src C:/Users/Tomas/Desktop/qgltennis/cutelogger/src
-LIBS *= -LC:/Users/Tomas/Desktop/qgltennis/QGLViewer/debug -lQGLViewerd2
+  INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src C:/Users/Tomas/Desktop/qgltennis/cutelogger/src
+  LIBS *= -LC:/Users/Tomas/Desktop/qgltennis/QGLViewer/debug -lQGLViewerd2
 }
 
 # Change these paths according to your configuration.
