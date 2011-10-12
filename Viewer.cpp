@@ -1,6 +1,7 @@
 #include "Viewer.h"
-
 #include <QKeyEvent>
+
+#include "vmath.h"
 
 using namespace qglviewer;
 using namespace std;
@@ -16,51 +17,48 @@ void Viewer::init()
 
   //glLineWidth(2.0);
 
-  court.init();
-  ball.init();
+  ball_.setInitialPosition(Vector3f(60.0, 130.0, 10.0));
+  court_.init();
+  ball_.init();
 }
 
 void Viewer::draw()
 {
   glColor3f(1.0, 1.0, 1.0);
-  court.draw();
-  courtHelper.draw();
-  ball.draw();
+  court_.draw();
+  courtHelper_.draw();
+  ball_.draw();
 
-  float t = ball.getT();
-  QString text("t: ");
+  printHelperValues();
+}
+
+void Viewer::printHelperValues()
+{
+  float t = ball_.getTime();
+  QString text("time: ");
   text += QString::number(t);
-  drawText(10, 20, text);
-
-  float xpos = ball.getXpos();
-  text = ("xpos: ");
-  text += QString::number(xpos);
   drawText(10, 40, text);
 
-  float ypos = ball.getYpos();
-  text = ("ypos: ");
-  text += QString::number(ypos);
+  text = "ballPos: ";
+  Vector3f ballPosition = ball_.getCurrentPosition();
+  text += ballPosition.toString().data();
   drawText(10, 60, text);
-
-  float zpos = ball.getZpos();
-  text = ("zpos: ");
-  text += QString::number(zpos);
-  drawText(10, 80, text);
-
-  float zplus = ball.getZplus();
-  text = ("z+: ");
+  
+  float zplus = ball_.getZplus();
+  float zminus = ball_.getZminus();  
+  text = ("ball Z terms: ");
   text += QString::number(zplus);
-  drawText(10, 100, text);
-
-  float zminus = ball.getZminus();
-  text = ("z-: ");
+  text += " - ";
   text += QString::number(zminus);
-  drawText(10, 120, text);
+  drawText(10, 80, text);
+  
+  text = "Press ENTER to bounce ball";
+  drawText(200, 20, text);
 }
 
 void Viewer::animate()
 {
-  ball.animate();
+  ball_.animate();
 }
 
 void Viewer::keyPressEvent(QKeyEvent *e)

@@ -2,36 +2,52 @@
 #define BALL_H
 
 #include <GL/glu.h>
+#include "vmath.h"
 
 class Ball
 {
 public:
   Ball() { }
+  
+  void setInitialPosition(Vector3f initialPosition) {
+    initialPosition_ = initialPosition;
+  }
+  
+  Vector3f getCurrentPosition() {
+    return position_;
+  }
+
   void init();
   void draw();
   void animate();
-  float getT() { return t; }
-  float getXpos() { return x_pos; }
-  float getYpos() { return y_pos; }
-  float getZpos() { return z_pos; }
-  float getZplus() { return (Vz*t+z_init); }
-  float getZminus() { return (-0.5*g*t*t); }
+  float getTime() { return t; }
+  float getZplus() { return zPlusTerm; }
+  float getZminus() { return zMinusTerm; }
 
 private:
   GLUquadricObj* qobj;
 
   static const float PI = 3.141592654;
-  static const float g = 9.8;
+  static const float GRAVITY = 9.8;
 
-  float x_init, y_init, z_init;
+  Vector3f initialPosition_;
+  
+  // Initial speed in polar coordinates
+  float speedModule_;
   float rho, theta;
-  float V;
+  
+  // Initial speep in cartesian coordinates
+  Vector3f speed_;
+  
+  
+  Vector3f position_;
 
-  float x_pos, y_pos, z_pos;
-  float Vx, Vy, Vz;
   float t, dt;
 
+  // Helpers for bounce
   int bounce;
+  float zPlusTerm;
+  float zMinusTerm;
 };
 
 #endif // BALL_H

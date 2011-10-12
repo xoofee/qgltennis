@@ -3,7 +3,7 @@
 #include "vmath.h"
 #include <GL/gl.h>
 
-Vector3f cornerPoint1(50.0, 150.0, 50.0), cornerPoint2(50.0, 618.0, 50.0), cornerPoint3(266.0, 618.0, 50.0), cornerPoint4(266.0,150.0, 50.0);
+Vector3f corner1(50.0, 150.0, 50.0), corner2(50.0, 618.0, 50.0), corner3(266.0, 618.0, 50.0), corner4(266.0,150.0, 50.0);
 Vector3f leftSingleLineEndPoint1(77.0, 150.0, 50.0), leftSingleLineEndPoint2(77.0, 618.0, 50.0);
 Vector3f rightSingleLineEndPoint1(239.0, 150.0, 50.0), rightSingleLineEndPoint2(239.0, 618.0, 50.0);
 Vector3f middleLineEndPoint1(50.0, 384.0, 50.0), middleLineEndPoint2(266.0, 384.0, 50.0);
@@ -17,9 +17,10 @@ void CourtHelper::draw()
 
   glBegin(GL_LINE_LOOP);
     glNormal3f(0.0, 0.0, 1.0);
-    glVertex3fv(cornerPoint1); glVertex3fv(cornerPoint2); glVertex3fv(cornerPoint3);
-    glVertex3fv(cornerPoint4); glVertex3fv(cornerPoint1);
+    glVertex3fv(corner1); glVertex3fv(corner2); glVertex3fv(corner3);
+    glVertex3fv(corner4); glVertex3fv(corner1);
   glEnd();
+  
   glBegin(GL_LINES);
     glNormal3f(0.0, 0.0, 1.0);
     glVertex3fv(leftSingleLineEndPoint1); glVertex3fv(leftSingleLineEndPoint2);
