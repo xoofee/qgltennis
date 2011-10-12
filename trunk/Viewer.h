@@ -12,8 +12,10 @@ protected :
   virtual void keyPressEvent(QKeyEvent *e);
 
 private :
+  void printHelperValues();
+  
   float ratio, u_max, v_max;
-  CourtHelper courtHelper;
-  Court court;
-  Ball ball;
+  CourtHelper courtHelper_;
+  Court court_;
+  Ball ball_;
 };
