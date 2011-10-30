@@ -10,16 +10,20 @@ void Ball::init()
   qobj = gluNewQuadric();
 
   glPointSize(3.0);
-  rho=PI/4.0;
-  theta=PI/8.0;
-  speedModule_=60.0;
+  
+  // Initial speed Polar
+  theta=PI/4.0;
+  phi=PI/8.0;
+  initialSpeedPolar_ = 60.0;
 
+  // Initial speed Cartesian
+  initialSpeed_.x = initialSpeedPolar_*sin(theta)*sin(phi);
+  initialSpeed_.y = initialSpeedPolar_*sin(theta)*cos(phi);
+  initialSpeed_.z = initialSpeedPolar_*cos(theta);
+
+  speed_ = initialSpeed_;
   position_ = initialPosition_;
-
-  speed_.x = speedModule_*sin(rho)*sin(theta);
-  speed_.y = speedModule_*sin(rho)*cos(theta);
-  speed_.z = speedModule_*cos(rho);
-
+      
   t=0.0;
   dt=0.2;
 
@@ -30,13 +34,18 @@ void Ball::draw()
 {
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  // Draw sphere
   glColor3f(1.0, 1.0, 0.0);
   glPushMatrix();
+  
+  // Draw speed vector
+  glBegin(GL_LINES);
+    glVertex3fv(position_); glVertex3fv(position_+speed_);
+  glEnd();
+  
+  // Draw sphere
   glTranslatef(position_.x, position_.y, position_.z);
   gluSphere(qobj, 5.0, 10, 10);
-  
-  
+
   glPopMatrix();
   
   //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -44,12 +53,14 @@ void Ball::draw()
 
 void Ball::animate()
 {
-  position_.x = initialPosition_.x + speed_.x*t;
-  position_.y = initialPosition_.y + speed_.y*t;
+  position_.x = initialPosition_.x + initialSpeed_.x*t;
+  position_.y = initialPosition_.y + initialSpeed_.y*t;
   
-  zPlusTerm = initialPosition_.z + speed_.z*t;
+  zPlusTerm = initialPosition_.z + initialSpeed_.z*t;
   zMinusTerm = 0.5*GRAVITY*t*t;
   position_.z = zPlusTerm - zMinusTerm;
+  
+  speed_.z = initialSpeed_.z - GRAVITY*t;
   
   t=t+dt;
 
@@ -63,11 +74,12 @@ void Ball::animate()
       LOG_DEBUG() << "other bounce";
       bounce = 0;
 
-      if (theta == PI/8.0) { theta=9.0*PI/8.0; }
-      else theta = PI/8.0;
-      speed_.x = speedModule_*sin(rho)*sin(theta);
-      speed_.y = speedModule_*sin(rho)*cos(theta);
-      speed_.z = speedModule_*cos(rho);
+      if (phi == PI/8.0) { phi=9.0*PI/8.0; }
+      else phi = PI/8.0;
+      initialSpeed_.x = initialSpeedPolar_*sin(theta)*sin(phi);
+      initialSpeed_.y = initialSpeedPolar_*sin(theta)*cos(phi);
+      initialSpeed_.z = initialSpeedPolar_*cos(theta);
+      speed_ = initialSpeed_;
     }
     
     initialPosition_.x = position_.x;

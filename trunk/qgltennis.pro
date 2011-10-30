@@ -51,6 +51,7 @@ unix {
 }
 
 win32 {
+  message ( qgltennis win32 )
   INCLUDEPATH *= C:/Users/Tomas/Desktop/qgltennis C:/Users/Tomas/Desktop/qgltennis/vmath-0.9/src C:/Users/Tomas/Desktop/qgltennis/cutelogger/src
   LIBS *= -LC:/Users/Tomas/Desktop/qgltennis/QGLViewer/debug -lQGLViewerd2
 }

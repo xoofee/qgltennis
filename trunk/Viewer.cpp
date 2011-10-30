@@ -34,23 +34,31 @@ void Viewer::draw()
 
 void Viewer::printHelperValues()
 {
+
   float t = ball_.getTime();
   QString text("time: ");
   text += QString::number(t);
   drawText(10, 40, text);
 
-  text = "ballPos: ";
-  Vector3f ballPosition = ball_.getCurrentPosition();
+  text = "Position: ";
+  Vector3f ballPosition = ball_.getPosition();
+  // This code (QString) causes core when exit:
+  // RtlWerpReportException failed with status code :-1073741823. Will try to launch the process directly
   text += ballPosition.toString().data();
   drawText(10, 60, text);
   
   float zplus = ball_.getZplus();
   float zminus = ball_.getZminus();  
-  text = ("ball Z terms: ");
+  text = ("Pos Z terms: ");
   text += QString::number(zplus);
   text += " - ";
   text += QString::number(zminus);
   drawText(10, 80, text);
+  
+  text = "Speed: ";
+  Vector3f ballSpeed = ball_.getSpeed();
+  text += ballSpeed.toString().data();
+  drawText(10, 100, text);
   
   text = "Press ENTER to bounce ball";
   drawText(200, 20, text);

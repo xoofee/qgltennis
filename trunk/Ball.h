@@ -13,10 +13,14 @@ public:
     initialPosition_ = initialPosition;
   }
   
-  Vector3f getCurrentPosition() {
+  Vector3f getPosition() {
     return position_;
   }
 
+  Vector3f getSpeed() {
+    return speed_;
+  }
+  
   void init();
   void draw();
   void animate();
@@ -32,15 +36,13 @@ private:
 
   Vector3f initialPosition_;
   
-  // Initial speed in polar coordinates
-  float speedModule_;
-  float rho, theta;
-  
-  // Initial speep in cartesian coordinates
-  Vector3f speed_;
-  
+  // Initial speed 
+  float initialSpeedPolar_; // in polar coordinates
+  float theta, phi;
+  Vector3f initialSpeed_;   // in cartesian coordinates
   
   Vector3f position_;
+  Vector3f speed_;
 
   float t, dt;
 
