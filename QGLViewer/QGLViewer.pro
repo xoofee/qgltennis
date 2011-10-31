@@ -9,9 +9,11 @@
 # USE_GLUT = yes
 
 TEMPLATE = lib
-TARGET = QGLViewer
+TARGET = ../../QGLViewer
 VERSION = 2.3.10
-CONFIG *= qt opengl warn_on shared thread create_prl rtti no_keywords
+CONFIG *= qt opengl warn_on shared thread rtti no_keywords
+#CONFIG -= release debug_and_release debug_and_release_target
+#QGLVIEWER_STATIC = yes
 
 QGL_HEADERS = qglviewer.h \
 	  camera.h \
@@ -119,8 +121,8 @@ contains( DEFINES, NO_VECTORIAL_RENDER ) {
 #		--  U n i x  --
 #               ---------------
 unix {
-  CONFIG -= debug debug_and_release
-  CONFIG *= release
+  #CONFIG -= debug debug_and_release
+  CONFIG *= debug
 
   # INCLUDE_DIR and LIB_DIR specify where to install the include files and the library.
   # Use qmake INCLUDE_DIR=... LIB_DIR=... , or qmake PREFIX=... to customize your installation.
@@ -261,7 +263,8 @@ macx|darwin-g++ {
 #               ---------------------
 win32 {
   # Windows requires a debug lib version to link against debug applications
-  CONFIG *= debug_and_release build_all
+  #CONFIG *= debug_and_release build_all
+  CONFIG *= debug
 
   # Needed by Intel C++, (icl.exe) so that WINGDIAPI is a defined symbol in gl.h.
   DEFINES *= WIN32
@@ -275,7 +278,7 @@ win32 {
   # Use the DLL version of Qt (Qt3 only)
   DEFINES *= QT_DLL QT_THREAD_SUPPORT
 
-  CONFIG *= embed_manifest_dll
+  #CONFIG *= embed_manifest_dll
 
   # Make sure to have C++ files, PentiumPro code, few warnings, add
   # support to RTTI and Exceptions, and generate debug info "program database".
@@ -292,9 +295,13 @@ win32 {
 
 
 contains( QT_VERSION, "^4.*" ) {
-   build_pass:CONFIG(debug, debug|release) {
+   build_pass:CONFIG(debug) {
      unix: TARGET = $$join(TARGET,,,_debug)
      else: TARGET = $$join(TARGET,,,d)
    }
 }
+
+  message (QGLViewer)
+  message ( DEFINES = $$DEFINES )
+  message ( CONFIG = $$CONFIG )
 
