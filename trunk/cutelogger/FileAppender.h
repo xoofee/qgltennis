@@ -53,7 +53,6 @@ class FileAppender : public AbstractStringAppender
   private:
     QFile m_logFile;
     QTextStream m_logStream;
-    mutable QMutex m_logFileMutex;
 };
 
 #endif // FILEAPPENDER_H

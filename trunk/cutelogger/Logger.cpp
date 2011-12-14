@@ -17,7 +17,6 @@
 
 // Qt
 #include <QCoreApplication>
-#include <QReadWriteLock>
 #include <QDateTime>
 #include <QIODevice>
 #include <QDebug>
@@ -34,8 +33,6 @@ class LogDevice : public QIODevice
 
     void lock(Logger::LogLevel logLevel, const char* file, int line, const char* function)
     {
-      m_selfMutex.lock();
-
       if (!isOpen())
         open(QIODevice::WriteOnly);
 
@@ -56,12 +53,10 @@ class LogDevice : public QIODevice
       if (maxSize > 0)
         Logger::write(m_logLevel, m_file, m_line, m_function, QString::fromLocal8Bit(QByteArray(data, maxSize)));
 
-      m_selfMutex.unlock();
       return maxSize;
     }
 
   private:
-    QMutex m_selfMutex;
     Logger::LogLevel m_logLevel;
     const char* m_file;
     int m_line;
@@ -85,19 +80,16 @@ class LoggerPrivate
 {
   public:
     static LoggerPrivate* m_self;
-    static QReadWriteLock m_selfLock;
 
     static LoggerPrivate* instance()
     {
       LoggerPrivate* result = 0;
       {
-        QReadLocker locker(&m_selfLock);
         result = m_self;
       }
 
       if (!result)
       {
-        QWriteLocker locker(&m_selfLock);
         m_self = new LoggerPrivate;
         qInstallMsgHandler(qtLoggerMessageHandler);
         qAddPostRoutine(cleanupLoggerPrivate);
@@ -116,20 +108,16 @@ class LoggerPrivate
     ~LoggerPrivate()
     {
       // Cleanup appenders
-      QReadLocker appendersLocker(&m_appendersLock);
       foreach (AbstractAppender* appender, m_appenders)
         delete appender;
 
       // Cleanup device
-      QReadLocker deviceLocker(&m_logDeviceLock);
       delete m_logDevice;
     }
 
 
     void registerAppender(AbstractAppender* appender)
     {
-      QWriteLocker locker(&m_appendersLock);
-
       if (!m_appenders.contains(appender))
         m_appenders.append(appender);
       else
@@ -141,13 +129,11 @@ class LoggerPrivate
     {
       LogDevice* result = 0;
       {
-        QReadLocker locker(&m_logDeviceLock);
         result = m_logDevice;
       }
 
       if (!result)
       {
-        QWriteLocker locker(&m_logDeviceLock);
         m_logDevice = new LogDevice;
         result = m_logDevice;
       }
@@ -159,8 +145,6 @@ class LoggerPrivate
     void write(const QDateTime& timeStamp, Logger::LogLevel logLevel, const char* file, int line, const char* function,
                const QString& message)
     {
-      QReadLocker locker(&m_appendersLock);
-
       if (!m_appenders.isEmpty())
       {
         foreach (AbstractAppender* appender, m_appenders)
@@ -207,20 +191,16 @@ class LoggerPrivate
 
   private:
     QList<AbstractAppender*> m_appenders;
-    QReadWriteLock m_appendersLock;
 
     LogDevice* m_logDevice;
-    QReadWriteLock m_logDeviceLock;
 };
 
 // Static fields initialization
 LoggerPrivate* LoggerPrivate::m_self = 0;
-QReadWriteLock LoggerPrivate::m_selfLock;
 
 
 static void cleanupLoggerPrivate()
 {
-  QWriteLocker locker(&LoggerPrivate::m_selfLock);
 
   delete LoggerPrivate::m_self;
   LoggerPrivate::m_self = 0;

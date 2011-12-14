@@ -17,8 +17,6 @@
 // Local
 #include <AbstractAppender.h>
 
-// Qt
-#include <QReadWriteLock>
 
 
 //! The AbstractStringAppender class provides a convinient base for appenders working with plain text formatted logs.
@@ -99,7 +97,6 @@ class AbstractStringAppender : public AbstractAppender
 
   private:
     QString m_format;
-    mutable QReadWriteLock m_formatLock;
 };
 
 #endif // ABSTRACTSTRINGAPPENDER_H

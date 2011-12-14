@@ -29,14 +29,12 @@ AbstractAppender::~AbstractAppender()
 
 Logger::LogLevel AbstractAppender::detailsLevel() const
 {
-  QMutexLocker locker(&m_detailsLevelMutex);
   return m_detailsLevel;
 }
 
 
 void AbstractAppender::setDetailsLevel(Logger::LogLevel level)
 {
-  QMutexLocker locker(&m_detailsLevelMutex);
   m_detailsLevel = level;
 }
 
@@ -46,7 +44,6 @@ void AbstractAppender::write(const QDateTime& timeStamp, Logger::LogLevel logLev
 {
   if (logLevel >= detailsLevel())
   {
-    QMutexLocker locker(&m_writeMutex);
     append(timeStamp, logLevel, file, line, function, message);
   }
 }
