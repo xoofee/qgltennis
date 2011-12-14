@@ -26,14 +26,12 @@ FileAppender::FileAppender(const QString& fileName)
 
 QString FileAppender::fileName() const
 {
-  QMutexLocker locker(&m_logFileMutex);
   return m_logFile.fileName();
 }
 
 
 void FileAppender::setFileName(const QString& s)
 {
-  QMutexLocker locker(&m_logFileMutex);
   if (m_logFile.isOpen())
     m_logFile.close();
 
@@ -44,8 +42,6 @@ void FileAppender::setFileName(const QString& s)
 void FileAppender::append(const QDateTime& timeStamp, Logger::LogLevel logLevel, const char* file, int line,
                           const char* function, const QString& message)
 {
-  QMutexLocker locker(&m_logFileMutex);
-
   if (!m_logFile.isOpen())
   {
     if (m_logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))

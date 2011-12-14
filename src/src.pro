@@ -41,7 +41,7 @@ unix {
 
 win32 {
   INCLUDEPATH *= ../QGLViewer ../vmath ../cutelogger
-  LIBS *= -L.. -lQGLViewerd2 -L../cutelogger -lcutelogger -L../vmath -lvmath
+  LIBS *= -L.. -lQGLViewerd2 -L../cutelogger -lcutelogger -L../vmath -lvmath 
 }
 
 message ( src )

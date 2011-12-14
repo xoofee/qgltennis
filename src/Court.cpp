@@ -8,6 +8,7 @@
 
 #include "Logger.h"
 #include <QDebug>
+#include <QDir>
 
 void Court::init()
 {
@@ -46,20 +47,13 @@ void Court::draw()
 void Court::loadImage()
 {
   QString name("./textures/s02_court.jpg");
+  LOG_DEBUG() << "CurrentPath:" << QDir::currentPath();
   LOG_DEBUG() << "Loading " << name;
-
+  
   QImage img(name);
-
   if (img.isNull()) {
     LOG_DEBUG() << name << "Not found";
-    
-    name = "./debug/textures/s02_court.jpg";
-    img.load(name);
-    
-    if (img.isNull()) {
-      LOG_DEBUG() << "Unable to load file " << name << "unsupported file format";
-      return;
-    }
+    return;
   }
   
   LOG_WARNING() << "Loading " << name.toLatin1().constData() << ", " << img.width() << "x" << img.height() << " pixels";

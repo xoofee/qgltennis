@@ -17,8 +17,6 @@
 // Local
 #include <Logger.h>
 
-// Qt
-#include <QMutex>
 
 //! The AbstractAppender class provides an abstract base class for writing a log entries.
 /**
@@ -106,10 +104,7 @@ class AbstractAppender
                         const char* function, const QString& message) = 0;
 
   private:
-    QMutex m_writeMutex;
-
     Logger::LogLevel m_detailsLevel;
-    mutable QMutex m_detailsLevelMutex;
 };
 
 #endif // ABSTRACTAPPENDER_H

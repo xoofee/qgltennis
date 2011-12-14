@@ -28,14 +28,12 @@ AbstractStringAppender::AbstractStringAppender()
 
 QString AbstractStringAppender::format() const
 {
-  QReadLocker locker(&m_formatLock);
   return m_format;
 }
 
 
 void AbstractStringAppender::setFormat(const QString& format)
 {
-  QWriteLocker locker(&m_formatLock);
   m_format = format;
 }
 
