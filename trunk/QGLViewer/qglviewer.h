@@ -25,13 +25,8 @@
 
 #include "camera.h"
 
-#if QT_VERSION >= 0x040000
-# include <QMap>
-# include <QClipboard>
-#else
-# include <qmap.h>
-# include <qclipboard.h>
-#endif
+#include <QMap>
+#include <QClipboard>
 
 class QTabWidget;
 
@@ -39,352 +34,113 @@ namespace qglviewer {
 	class MouseGrabber;
 }
 
-#if QT_VERSION >= 0x040000
-// Qt::ButtonState was split into Qt::KeyboardModifiers and Qt::MouseButtons in Qt 4.
-# define QtKeyboardModifiers Qt::KeyboardModifiers
-# define QtMouseButtons Qt::MouseButtons
-#else
-# define QtKeyboardModifiers Qt::ButtonState
-# define QtMouseButtons Qt::ButtonState
-#endif
+#define QtKeyboardModifiers Qt::KeyboardModifiers
+#define QtMouseButtons Qt::MouseButtons
 
-/*! \brief A versatile 3D OpenGL viewer based on QGLWidget.
-\class QGLViewer qglviewer.h QGLViewer/qglviewer.h
-
-It features many classical viewer functionalities, such as a camera trackball, manipulated objects,
-snapshot saving and much <a href="../features.html">more</a>. Its main goal is to ease the development
-of new 3D applications.
-
-New users should read the <a href="../introduction.html">introduction page</a> to get familiar with
-important notions such as sceneRadius(), sceneCenter() and the world coordinate system. Try the
-numerous simple <a href="../examples/index.html">examples</a> to discover the possibilities and
-understand how it works.
-
-<h3>Usage</h3>
-
-To use a QGLViewer, derive you viewer class from the QGLViewer and overload its draw() virtual
-method. See the <a href="../examples/simpleViewer.html">simpleViewer example</a> for an illustration.
-
-An other option is to connect your drawing methods to the signals emitted by the QGLViewer (Qt's
-callback mechanism). See the <a href="../examples/callback.html">callback example</a> for a
-complete implementation.
-
-\nosubgrouping */
 class QGLVIEWER_EXPORT QGLViewer : public QGLWidget
 {
 	Q_OBJECT
 
 public:
-	// Complete implementation is provided so that the constructor is defined with QT3_SUPPORT when .h is included.
-	// (Would not be available otherwise since lib is compiled without QT3_SUPPORT).
-#if QT_VERSION < 0x040000 || defined QT3_SUPPORT
-	explicit QGLViewer(QWidget* parent=NULL, const char* name=0, const QGLWidget* shareWidget=0, Qt::WFlags flags=0)
-		: QGLWidget(parent, name, shareWidget, flags)
-	{ defaultConstructor(); }
-
-	explicit QGLViewer(const QGLFormat& format, QWidget* parent=0, const char* name=0, const QGLWidget* shareWidget=0,Qt::WFlags flags=0)
-		: QGLWidget(format, parent, name, shareWidget, flags)
-	{ defaultConstructor(); }
-
-	QGLViewer(QGLContext* context, QWidget* parent, const char* name=0, const QGLWidget* shareWidget=0, Qt::WFlags flags=0)
-# if QT_VERSION >= 0x030200
-		: QGLWidget(context, parent, name, shareWidget, flags) {
-# else
-		// MOC_SKIP_BEGIN
-		: QGLWidget(parent, name, shareWidget, flags) {
-			Q_UNUSED(context);
-			// MOC_SKIP_END
-# endif
-			defaultConstructor(); }
-
-#else
-
 	explicit QGLViewer(QWidget* parent=0, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);
 	explicit QGLViewer(QGLContext *context, QWidget* parent=0, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);
 	explicit QGLViewer(const QGLFormat& format, QWidget* parent=0, const QGLWidget* shareWidget=0, Qt::WFlags flags=0);
-#endif
 
 	virtual ~QGLViewer();
 
-	/*! @name Display of visual hints */
-	//@{
 public:
-	/*! Returns \c true if the world axis is drawn by the viewer.
-
-	Set by setAxisIsDrawn() or toggleAxisIsDrawn(). Default value is \c false. */
-	bool axisIsDrawn() const { return axisIsDrawn_; };
-	/*! Returns \c true if a XY grid is drawn by the viewer.
-
-	Set by setGridIsDrawn() or toggleGridIsDrawn(). Default value is \c false. */
-	bool gridIsDrawn() const { return gridIsDrawn_; };
-	/*! Returns \c true if the viewer displays the current frame rate (Frames Per Second).
-
-	Use QApplication::setFont() to define the display font (see drawText()).
-
-	Set by setFPSIsDisplayed() or toggleFPSIsDisplayed(). Use currentFPS() to get the current FPS.
-	Default value is \c false. */
-	bool FPSIsDisplayed() const { return FPSIsDisplayed_; };
-	/*! Returns \c true if text display (see drawText()) is enabled.
-
-	Set by setTextIsEnabled() or toggleTextIsEnabled(). This feature conveniently removes all the
-	possibly displayed text, cleaning display. Default value is \c true. */
-	bool textIsEnabled() const { return textIsEnabled_; };
-
-	/*! Returns \c true if the camera() is being edited in the viewer.
-
-	Set by setCameraIsEdited() or toggleCameraIsEdited(). Default value is \p false.
-
-	The current implementation is limited: the defined camera() paths (see
-	qglviewer::Camera::keyFrameInterpolator()) are simply displayed using
-	qglviewer::Camera::drawAllPaths(). Actual camera and path edition will be implemented in the
-	future. */
+	bool axisIsDrawn() const { return axisIsDrawn_; }
+	bool gridIsDrawn() const { return gridIsDrawn_; }
+	bool FPSIsDisplayed() const { return FPSIsDisplayed_; }
+	bool textIsEnabled() const { return textIsEnabled_; }
 	bool cameraIsEdited() const { return cameraIsEdited_; }
+  
+public Q_SLOTS:
+	void setAxisIsDrawn(bool draw=true) { 
+      axisIsDrawn_ = draw; 
+      Q_EMIT axisIsDrawnChanged(draw); 
+      if (updateGLOK_) updateGL(); 
+    }
 
+	void setGridIsDrawn(bool draw=true) { 
+      gridIsDrawn_ = draw; 
+      Q_EMIT gridIsDrawnChanged(draw); 
+      if (updateGLOK_) updateGL();
+    }
 
-	public Q_SLOTS:
-		/*! Sets the state of axisIsDrawn(). Emits the axisIsDrawnChanged() signal. See also toggleAxisIsDrawn(). */
-		void setAxisIsDrawn(bool draw=true) { axisIsDrawn_ = draw; Q_EMIT axisIsDrawnChanged(draw); if (updateGLOK_) updateGL(); };
-		/*! Sets the state of gridIsDrawn(). Emits the gridIsDrawnChanged() signal. See also toggleGridIsDrawn(). */
-		void setGridIsDrawn(bool draw=true) { gridIsDrawn_ = draw; Q_EMIT gridIsDrawnChanged(draw); if (updateGLOK_) updateGL(); };
-		/*! Sets the state of FPSIsDisplayed(). Emits the FPSIsDisplayedChanged() signal. See also toggleFPSIsDisplayed(). */
-		void setFPSIsDisplayed(bool display=true) { FPSIsDisplayed_ = display; Q_EMIT FPSIsDisplayedChanged(display); if (updateGLOK_) updateGL(); };
-		/*! Sets the state of textIsEnabled(). Emits the textIsEnabledChanged() signal. See also toggleTextIsEnabled(). */
-		void setTextIsEnabled(bool enable=true) { textIsEnabled_ = enable; Q_EMIT textIsEnabledChanged(enable); if (updateGLOK_) updateGL(); };
+	void setFPSIsDisplayed(bool display=true) { 
+    FPSIsDisplayed_ = display;
+    Q_EMIT FPSIsDisplayedChanged(display);
+    if (updateGLOK_) updateGL();
+  }
+		void setTextIsEnabled(bool enable=true) { 
+      textIsEnabled_ = enable;
+      Q_EMIT textIsEnabledChanged(enable);
+      if (updateGLOK_) updateGL();
+    }
+    
 		void setCameraIsEdited(bool edit=true);
 
-		/*! Toggles the state of axisIsDrawn(). See also setAxisIsDrawn(). */
-		void toggleAxisIsDrawn() { setAxisIsDrawn(!axisIsDrawn()); };
-		/*! Toggles the state of gridIsDrawn(). See also setGridIsDrawn(). */
-		void toggleGridIsDrawn() { setGridIsDrawn(!gridIsDrawn()); };
-		/*! Toggles the state of FPSIsDisplayed(). See also setFPSIsDisplayed(). */
-		void toggleFPSIsDisplayed() { setFPSIsDisplayed(!FPSIsDisplayed()); };
-		/*! Toggles the state of textIsEnabled(). See also setTextIsEnabled(). */
-		void toggleTextIsEnabled() { setTextIsEnabled(!textIsEnabled()); };
-		/*! Toggles the state of cameraIsEdited(). See also setCameraIsEdited(). */
-		void toggleCameraIsEdited() { setCameraIsEdited(!cameraIsEdited()); };
-		//@}
+		void toggleAxisIsDrawn() { setAxisIsDrawn(!axisIsDrawn()); }
+		void toggleGridIsDrawn() { setGridIsDrawn(!gridIsDrawn()); }
+		void toggleFPSIsDisplayed() { setFPSIsDisplayed(!FPSIsDisplayed()); }
+		void toggleTextIsEnabled() { setTextIsEnabled(!textIsEnabled()); }
+		void toggleCameraIsEdited() { setCameraIsEdited(!cameraIsEdited()); }
 
-
-		/*! @name Viewer's colors */
-		//@{
 public:
-	/*! Returns the background color of the viewer.
-
-	This method is provided for convenience since the background color is an OpenGL state variable
-	set with \c glClearColor(). However, this internal representation has the advantage that it is
-	saved (resp. restored) with saveStateToFile() (resp. restoreStateFromFile()).
-
-	Use setBackgroundColor() to define and activate a background color.
-
-	\attention Each QColor component is an integer ranging from 0 to 255. This differs from the float
-	values used by \c glClearColor() which are in the 0.0-1.0 range. Default value is (51, 51, 51)
-	(dark gray). You may have to change foregroundColor() accordingly.
-
-	\attention This method does not return the current OpenGL clear color as \c glGet() does. Instead,
-	it returns the QGLViewer internal variable. If you directly use \c glClearColor() or \c
-	qglClearColor() instead of setBackgroundColor(), the two results will differ. */
-	QColor backgroundColor() const { return backgroundColor_; };
-
-	/*! Returns the foreground color used by the viewer.
-
-	This color is used when FPSIsDisplayed(), gridIsDrawn(), to display the camera paths when the
-	cameraIsEdited().
-
-	\attention Each QColor component is an integer in the range 0-255. This differs from the float
-	values used by \c glColor3f() which are in the range 0-1. Default value is (180, 180, 180) (light
-	gray).
-
-	Use \c qglColor(foregroundColor()) to set the current OpenGL color to the foregroundColor().
-
-	See also backgroundColor(). */
-	QColor foregroundColor() const { return foregroundColor_; };
+	QColor backgroundColor() const { return backgroundColor_; }
+	QColor foregroundColor() const { return foregroundColor_; }
 	public Q_SLOTS:
-		/*! Sets the backgroundColor() of the viewer and calls \c qglClearColor(). See also
-		setForegroundColor(). */
-		void setBackgroundColor(const QColor& color) { backgroundColor_=color; qglClearColor(color); };
-		/*! Sets the foregroundColor() of the viewer, used to draw visual hints. See also setBackgroundColor(). */
-		void setForegroundColor(const QColor& color) { foregroundColor_ = color; };
-		//@}
 
+		void setBackgroundColor(const QColor& color) { backgroundColor_=color; qglClearColor(color); }
+		void setForegroundColor(const QColor& color) { foregroundColor_ = color; }
 
-		/*! @name Scene dimensions */
-		//@{
 public:
-	/*! Returns the scene radius.
-
-	The entire displayed scene should be included in a sphere of radius sceneRadius(), centered on
-	sceneCenter().
-
-	This approximate value is used by the camera() to set qglviewer::Camera::zNear() and
-	qglviewer::Camera::zFar(). It is also used to showEntireScene() or to scale the world axis
-	display..
-
-	Default value is 1.0. This method is equivalent to camera()->sceneRadius(). See
-	setSceneRadius(). */
 	float sceneRadius() const { return camera()->sceneRadius(); }
-	/*! Returns the scene center, defined in world coordinates.
-
-	See sceneRadius() for details.
-
-	Default value is (0,0,0). Simply a wrapper for camera()->sceneCenter(). Set using
-	setSceneCenter().
-
-	Do not mismatch this value (that only depends on the scene) with the qglviewer::Camera::revolveAroundPoint(). */
 	qglviewer::Vec sceneCenter() const { return camera()->sceneCenter(); }
 
 	public Q_SLOTS:
-		/*! Sets the sceneRadius().
-
-		The camera() qglviewer::Camera::flySpeed() is set to 1% of this value by this method. Simple
-		wrapper around camera()->setSceneRadius(). */
 		virtual void setSceneRadius(float radius) { camera()->setSceneRadius(radius); }
-
-		/*! Sets the sceneCenter(), defined in world coordinates.
-
-		\attention The qglviewer::Camera::revolveAroundPoint() is set to the sceneCenter() value by this
-		method. */
 		virtual void setSceneCenter(const qglviewer::Vec& center) { camera()->setSceneCenter(center); }
-
-		/*! Convenient way to call setSceneCenter() and setSceneRadius() from a (world axis aligned) bounding box of the scene.
-
-		This is equivalent to:
-		\code
-		setSceneCenter((m+M)/2.0);
-		setSceneRadius(0.5*(M-m).norm());
-		\endcode */
 		void setSceneBoundingBox(const qglviewer::Vec& min, const qglviewer::Vec& max) { camera()->setSceneBoundingBox(min,max); }
-
-		/*! Moves the camera so that the entire scene is visible.
-
-		Simple wrapper around qglviewer::Camera::showEntireScene(). */
 		void showEntireScene() { camera()->showEntireScene(); if (updateGLOK_) updateGL(); }
-		//@}
 
-
-		/*! @name Associated objects */
-		//@{
 public:
-	/*! Returns the associated qglviewer::Camera, never \c NULL. */
-	qglviewer::Camera* camera() const { return camera_; };
-
-	/*! Returns the viewer's qglviewer::ManipulatedFrame.
-
-	This qglviewer::ManipulatedFrame can be moved with the mouse when the associated mouse bindings
-	are used (default is when pressing the \c Control key with any mouse button). Use
-	setMouseBinding() to define new bindings.
-
-	See the <a href="../examples/manipulatedFrame.html">manipulatedFrame example</a> for a complete
-	implementation.
-
-	Default value is \c NULL, meaning that no qglviewer::ManipulatedFrame is set. */
-	qglviewer::ManipulatedFrame* manipulatedFrame() const { return manipulatedFrame_; };
+	qglviewer::Camera* camera() const { return camera_; }
+	qglviewer::ManipulatedFrame* manipulatedFrame() const { return manipulatedFrame_; }
 
 	public Q_SLOTS:
 		void setCamera(qglviewer::Camera* const camera);
 		void setManipulatedFrame(qglviewer::ManipulatedFrame* frame);
-		//@}
 
-
-		/*! @name Mouse grabbers */
-		//@{
 public:
-	/*! Returns the current qglviewer::MouseGrabber, or \c NULL if no qglviewer::MouseGrabber
-	currently grabs mouse events.
-
-	When qglviewer::MouseGrabber::grabsMouse(), the different mouse events are sent to the
-	mouseGrabber() instead of their usual targets (camera() or manipulatedFrame()).
-
-	See the qglviewer::MouseGrabber documentation for details on MouseGrabber's mode of operation.
-
-	In order to use MouseGrabbers, you need to enable mouse tracking (so that mouseMoveEvent() is
-	called even when no mouse button is pressed). Add this line in init() or in your viewer
-	constructor:
-	\code
-	setMouseTracking(true);
-	\endcode
-	Note that mouse tracking is disabled by default. Use QWidget::hasMouseTracking() to
-	retrieve current state. */
-	qglviewer::MouseGrabber* mouseGrabber() const { return mouseGrabber_; };
+	qglviewer::MouseGrabber* mouseGrabber() const { return mouseGrabber_; }
 
 	void setMouseGrabberIsEnabled(const qglviewer::MouseGrabber* const mouseGrabber, bool enabled=true);
-	/*! Returns \c true if \p mouseGrabber is enabled.
-
-	Default value is \c true for all MouseGrabbers. When set to \c false using
-	setMouseGrabberIsEnabled(), the specified \p mouseGrabber will never become the mouseGrabber() of
-	this QGLViewer. This is useful when you use several viewers: some MouseGrabbers may only have a
-	meaning for some specific viewers and should not be selectable in others.
-
-	You can also use qglviewer::MouseGrabber::removeFromMouseGrabberPool() to completely disable a
-	MouseGrabber in all the QGLViewers. */
-	bool mouseGrabberIsEnabled(const qglviewer::MouseGrabber* const mouseGrabber) { return !disabledMouseGrabbers_.contains(reinterpret_cast<size_t>(mouseGrabber)); };
+	bool mouseGrabberIsEnabled(const qglviewer::MouseGrabber* const mouseGrabber) { 
+    return !disabledMouseGrabbers_.contains(reinterpret_cast<size_t>(mouseGrabber));
+  }
+  
 	public Q_SLOTS:
 		void setMouseGrabber(qglviewer::MouseGrabber* mouseGrabber);
-		//@}
 
-
-		/*! @name State of the viewer */
-		//@{
 public:
-	/*! Returns the aspect ratio of the viewer's widget (width() / height()). */
-	float aspectRatio() const { return static_cast<float>(width())/static_cast<float>(height()); };
-	/*! Returns the current averaged viewer frame rate.
-
-	This value is computed and averaged over 20 successive frames. It only changes every 20 draw()
-	(previously computed value is otherwise returned).
-
-	This method is useful for true real-time applications that may adapt their computational load
-	accordingly in order to maintain a given frequency.
-
-	This value is meaningful only when draw() is regularly called, either using a \c QTimer, when
-	animationIsStarted() or when the camera is manipulated with the mouse.  */
-	float currentFPS() { return f_p_s_; };
-	/*! Returns \c true if the viewer is in fullScreen mode.
-
-	Default value is \c false. Set by setFullScreen() or toggleFullScreen().
-
-	Note that if the QGLViewer is embedded in an other QWidget, it returns \c true when the top level
-	widget is in full screen mode. */
-	bool isFullScreen() const { return fullScreen_; };
-	/*! Returns \c true if the viewer displays in stereo.
-
-	The QGLViewer object must be created with a stereo format to handle stereovision:
-	\code
-	QGLFormat format;
-	format.setStereoDisplay( TRUE );
-	QGLViewer viewer(format);
-	\endcode
-	The hardware needs to support stereo display. Try the <a
-	href="../examples/stereoViewer.html">stereoViewer example</a> to check.
-
-	Set by setStereoDisplay() or toggleStereoDisplay(). Default value is \c false.
-
-	Stereo is performed using the Parallel axis asymmetric frustum perspective projection method.
-	See Camera::loadProjectionMatrixStereo() and Camera::loadModelViewMatrixStereo().
-
-	The stereo parameters are defined by the camera(). See qglviewer::Camera::setIODistance(),
-	qglviewer::Camera::setPhysicalDistanceToScreen(),
-	qglviewer::Camera::setPhysicalScreenWidth() and
-	qglviewer::Camera::setFocusDistance(). */
+	float aspectRatio() const { return static_cast<float>(width())/static_cast<float>(height()); }
+	float currentFPS() { return f_p_s_; }
+	bool isFullScreen() const { return fullScreen_; }
 	bool displaysInStereo() const { return stereo_; }
-	/*! Returns the recommended size for the QGLViewer. Default value is 600x400 pixels. */
 	virtual QSize sizeHint() const { return QSize(600, 400); }
 
 	public Q_SLOTS:
 		void setFullScreen(bool fullScreen=true);
 		void setStereoDisplay(bool stereo=true);
-		/*! Toggles the state of isFullScreen(). See also setFullScreen(). */
-		void toggleFullScreen() { setFullScreen(!isFullScreen()); };
-		/*! Toggles the state of displaysInStereo(). See setStereoDisplay(). */
-		void toggleStereoDisplay() { setStereoDisplay(!stereo_); };
+		void toggleFullScreen() { setFullScreen(!isFullScreen()); }
+		void toggleStereoDisplay() { setStereoDisplay(!stereo_); }
 		void toggleCameraMode();
 
 private:
 	bool cameraIsInRevolveMode() const;
-	//@}
 
-
-	/*! @name Display methods */
-	//@{
 public:
 	static void drawArrow(float length=1.0f, float radius=-1.0f, int nbSubdivisions=12);
 	static void drawArrow(const qglviewer::Vec& from, const qglviewer::Vec& to, float radius=-1.0f, int nbSubdivisions=12);
@@ -403,13 +159,9 @@ protected:
 
 private:
 	void displayFPS();
-	/*! Vectorial rendering callback method. */
-	void drawVectorial() { paintGL(); };
 
-#ifndef DOXYGEN
-	friend void drawVectorial(void* param);
-#endif
-	//@}
+public:
+	void drawVectorial() { paintGL(); }
 
 
 #ifdef DOXYGEN
@@ -1061,7 +813,7 @@ public:
 		// Files are stored in a dedicated directory under user's home directory.
 		setStateFileName(QDir::homeDirPath + "/.config/myApp.xml");
 		\endcode */
-		void setStateFileName(const QString& name) { stateFileName_ = name; };
+		void setStateFileName(const QString& name) { stateFileName_ = name; }
 
 #ifndef DOXYGEN
 		void saveToFile(const QString& fileName=QString::null);
@@ -1087,11 +839,8 @@ public:
 
 	\attention With Qt version 3, this method returns a \c QPtrList instead. Use a \c QPtrListIterator
 	to iterate on the list instead.*/
-#if QT_VERSION >= 0x040000
-	static const QList<QGLViewer*>& QGLViewerPool() { return QGLViewer::QGLViewerPool_; };
-#else
-	static const QPtrList<QGLViewer>& QGLViewerPool() { return QGLViewer::QGLViewerPool_; };
-#endif
+	static const QList<QGLViewer*>& QGLViewerPool() { return QGLViewer::QGLViewerPool_; }
+
 
 
 	/*! Returns the index of the QGLViewer \p viewer in the QGLViewerPool(). This index in unique and
@@ -1101,11 +850,8 @@ public:
 	When a QGLViewer is deleted, the QGLViewers' indexes are preserved and NULL is set for that index.
         When a QGLViewer is created, it is placed in the first available position in that list.
         Returns -1 if the QGLViewer could not be found (which should not be possible). */
-#if QT_VERSION >= 0x040000
-	static int QGLViewerIndex(const QGLViewer* const viewer) { return QGLViewer::QGLViewerPool_.indexOf(const_cast<QGLViewer*>(viewer)); };
-#else
-	static int QGLViewerIndex(const QGLViewer* const viewer) { return QGLViewer::QGLViewerPool_.findRef(viewer); };
-#endif
+	static int QGLViewerIndex(const QGLViewer* const viewer) { return QGLViewer::QGLViewerPool_.indexOf(const_cast<QGLViewer*>(viewer)); }
+
 	//@}
 
 #ifndef DOXYGEN
@@ -1122,7 +868,7 @@ public:
 
 		private Q_SLOTS:
 			// Patch for a Qt bug with fullScreen on startup
-			void delayedFullScreen() { move(prevPos_); setFullScreen(); };
+			void delayedFullScreen() { move(prevPos_); setFullScreen(); }
 			void hideMessage();
 
 private:
@@ -1257,11 +1003,7 @@ private:
 	TileRegion* tileRegion_;
 
 	// Q G L V i e w e r   p o o l
-#if QT_VERSION >= 0x040000
 	static QList<QGLViewer*> QGLViewerPool_;
-#else
-	static QPtrList<QGLViewer> QGLViewerPool_;
-#endif
 
 	// S t a t e   F i l e
 	QString stateFileName_;
